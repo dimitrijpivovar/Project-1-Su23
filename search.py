@@ -19,6 +19,7 @@ Pacman agents (in searchAgents.py).
 
 import util
 
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -67,10 +68,15 @@ def tinyMazeSearch(problem):
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
-    from game import Directions
-    s = Directions.SOUTH
-    w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
+
+from game import Directions
+s = Directions.SOUTH
+w = Directions.WEST
+e = Directions.EAST
+n = Directions.NORTH
+visited: list = []
+steps: list = []
 
 def depthFirstSearch(problem: SearchProblem):
     """
@@ -87,12 +93,38 @@ def depthFirstSearch(problem: SearchProblem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    visited: list = []
+    directions: list = []
+    return traverseGraphViaDepthFirst(problem, problem.getStartState(), visited, directions)
+    
+def traverseGraphViaDepthFirst(problem: SearchProblem, coordinates, visited: list, directions:list):
+    if problem.isGoalState(coordinates):
+        return directions
+    if coordinates not in visited:
+        visited.append(coordinates)
+    for neighbor_coordinates, neighbor_direction, step_cost in problem.getSuccessors(coordinates):
+        if neighbor_coordinates not in visited:
+            result = traverseGraphViaDepthFirst(problem, neighbor_coordinates, visited, directions + [neighbor_direction])
+            if result:
+                return result
+    return None
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
+    queue: list = [(start, [])]
+    visited: list = [(start)]
+
+    while(len(queue) != 0):
+        end, directions = queue.pop(0)
+        if(problem.isGoalState(end)):
+            return directions
+        if(end not in visited):
+            visited.append(end)
+        for neighbor_coordinates, neighbor_direction, step_cost in problem.getSuccessors(end):
+            if neighbor_coordinates not in visited:
+                queue.append((neighbor_coordinates, directions + [neighbor_direction]))
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
